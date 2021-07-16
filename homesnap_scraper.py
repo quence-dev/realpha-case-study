@@ -7,10 +7,12 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import json
 
-PATH = '/Users/Quence/Webdrivers/chromedriver' #wherever the webdriver is located
+# webdriver location on computer
+PATH = '/Users/Quence/Webdrivers/chromedriver'
 driver = webdriver.Chrome(PATH)
 
-driver.get('https://www.homesnap.com/') #open a webpage
+# open a webpage
+driver.get('https://www.homesnap.com/')
 print("Connected to: "+driver.title)
 
 main = driver.find_element_by_tag_name('main') #find the HTML element
