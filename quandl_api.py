@@ -1,6 +1,8 @@
 import mysql.connector
-import json, requests
+import json
+import requests
 import quandl
+import pandas as pd
 
 # load configs
 with open("config.json") as json_data_file:
@@ -20,10 +22,14 @@ db = mysql.connector.connect(
 cursor = db.cursor()
 # cursor.execute("CREATE DATABASE test")
 
+# run GET request on API
 response = requests.get(endpoint + 'indicator_id=ZSFH&region_id=10001&api_key=' + key)
+homes = response.json()
+
+# prints each column in datatable
+for home in homes['datatable']['data']:
+    print(home)
 
 # DONE USING QUANDL MODULE:
 # quandl.ApiConfig.api_key = data["api_key"]
 # response = quandl.get_table('ZILLOW/DATA', indicator_id='ZSFH', region_id='10001')
-
-print()
