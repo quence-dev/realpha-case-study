@@ -5,7 +5,7 @@ import quandl
 import numpy as np
 
 # load configs
-with open("config.json") as json_data_file:
+with open('config.json') as json_data_file:
     data = json.load(json_data_file)    
 
 pw = data["mysql"]
@@ -31,6 +31,10 @@ def getData(indicator,region):
 
 # prints each column in datatable
 homes = getData('ZSFH', '10001')
+
+# save raw json file
+# with open('data.json', 'w') as f:
+#     json.dump(homes, f)
 
 price_array = []
 for home in homes['datatable']['data']:
