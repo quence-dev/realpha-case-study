@@ -1,22 +1,24 @@
 import mysql.connector
 import json
 import requests
-import quandl
 import numpy as np
+from config import api_key, endpoint, mysql_pw
+# import quandl
+# import pandas as pd
 
 # load configs
-with open('config.json') as json_data_file:
-    data = json.load(json_data_file)    
+# with open('config.json') as json_data_file:
+#     data = json.load(json_data_file)    
 
-pw = data["mysql"]
-key = data["api_key"]
-endpoint = data["endpoint"]
+# key = data["api_key"]
+# endpoint = data["endpoint"]
 
 # connect to MySQL
+# mysql_pw = data["mysql_pw"]
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    passwd = pw,
+    passwd = mysql_pw,
     database = "test"
 )
 cursor = db.cursor()
@@ -26,7 +28,8 @@ cursor = db.cursor()
 def getData(indicator,region):
     response = requests.get(endpoint +
     'indicator_id=' + indicator +
-    '&region_id=' + region + '&api_key=' + key)
+    '&region_id=' + region +
+    '&api_key=' + api_key )
     return response.json()
 
 # prints each column in datatable
@@ -44,6 +47,7 @@ for home in homes['datatable']['data']:
 np_price = np.array(price_array)
 avg_price = np.average(np_price)
 
+print('Number of listings: %d' % np_price.size)
 print(int(avg_price))
 
 # DONE USING QUANDL MODULE:
