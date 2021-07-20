@@ -2,7 +2,7 @@ import mysql.connector
 import json
 import requests
 import quandl
-import pandas as pd
+import numpy as np
 
 # load configs
 with open("config.json") as json_data_file:
@@ -23,12 +23,24 @@ cursor = db.cursor()
 # cursor.execute("CREATE DATABASE test")
 
 # run GET request on API
-response = requests.get(endpoint + 'indicator_id=ZSFH&region_id=10001&api_key=' + key)
-homes = response.json()
+def getData(indicator,region):
+    response = requests.get(endpoint +
+    'indicator_id=' + indicator +
+    '&region_id=' + region + '&api_key=' + key)
+    return response.json()
 
 # prints each column in datatable
+homes = getData('ZSFH', '10001')
+
+price_array = []
 for home in homes['datatable']['data']:
+    price_array.append(home[3])
     print(home)
+
+np_price = np.array(price_array)
+avg_price = np.average(np_price)
+
+print(int(avg_price))
 
 # DONE USING QUANDL MODULE:
 # quandl.ApiConfig.api_key = data["api_key"]
