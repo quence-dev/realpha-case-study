@@ -22,7 +22,7 @@ db = mysql.connector.connect(
     database = "test"
 )
 cursor = db.cursor()
-# cursor.execute("CREATE DATABASE test")
+# cursor.execute("CREATE DATABASE quandl")
 
 # run GET request on API
 def getData(indicator,region):
