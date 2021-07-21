@@ -12,11 +12,8 @@ PATH = '/Users/Quence/Webdrivers/chromedriver'
 driver = webdriver.Chrome(PATH)
 
 # open a webpage
-def connectToSite(url):
-    driver.get(url)
-    print("Connected to: "+driver.title)
-
-connectToSite('https://www.homesnap.com/')
+driver.get('https://www.homesnap.com/')
+print("Connected to: " + driver.title)
 
 main = driver.find_element_by_tag_name('main') #find the HTML element
 search = main.find_element_by_tag_name('input') 
@@ -28,8 +25,9 @@ try:
     results = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.TAG_NAME, 'script'))
     )
-    data = results.get_attribute('innerHTML')
-    print(data)
+    # data = results.json()
+    # print(data)
+    print(type(results))
 except:
     print("JSON failed")
     driver.quit()
