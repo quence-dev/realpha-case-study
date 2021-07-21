@@ -21,9 +21,28 @@ search.clear() #ensure text field is empty
 search.send_keys("New York, NY") #type a string into input
 search.send_keys(Keys.RETURN) #hit enter
 
+
+pause = 0.5
+last_height = driver.execute_script("return document.body.scrollHeight")
+print("Last height: %d" % last_height)
+
+while True:
+    # Scroll down to bottom
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    # Wait to load page
+    time.sleep(pause)
+
+    # Calculate new scroll height and compare with last scroll height
+    new_height = driver.execute_script("return document.body.scrollHeight")
+    if new_height == last_height:
+        break
+    last_height = new_height
+
 try:
     # main2 = driver.find_element_by_tag_name('main')
     # scripts = main2.find_element_by_xpath('//*[contains(@id,"divList")]/script')
+    
     results = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[itemprop="streetAddress"]'))
     )
