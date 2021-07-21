@@ -3,3 +3,5 @@ config.py
 *.json
 __pycache__/
 env/
+test_scraper.py
+test_scraper2.py
