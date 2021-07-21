@@ -22,15 +22,20 @@ search.send_keys("New York, NY") #type a string into input
 search.send_keys(Keys.RETURN) #hit enter
 
 try:
+    # main2 = driver.find_element_by_tag_name('main')
+    # scripts = main2.find_element_by_xpath('//*[contains(@id,"divList")]/script')
     results = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.TAG_NAME, 'script'))
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[itemprop="streetAddress"]'))
     )
-    # data = results.json()
-    # print(data)
-    print(type(results))
+    # results = main.find_element_by_tag_name('script')
+    for result in results:
+        print(result.text)
+    # print(script.get_attribute('outerHTML'))
 except:
     print("JSON failed")
     driver.quit()
 
 time.sleep(5)
 driver.quit()
+
+
