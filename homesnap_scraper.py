@@ -22,29 +22,32 @@ search.send_keys("New York, NY") #type a string into input
 search.send_keys(Keys.RETURN) #hit enter
 
 
-pause = 0.5
-last_height = driver.execute_script("return document.body.scrollHeight")
-print("Last height: %d" % last_height)
+# pause = 0.5
+# last_height = driver.execute_script("return document.body.scrollHeight")
+# print("Last height: %d" % last_height)
 
-while True:
-    # Scroll down to bottom
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+# while True:
+#     # Scroll down to bottom
+#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-    # Wait to load page
-    time.sleep(pause)
+#     # Wait to load page
+#     time.sleep(pause)
 
-    # Calculate new scroll height and compare with last scroll height
-    new_height = driver.execute_script("return document.body.scrollHeight")
-    if new_height == last_height:
-        break
-    last_height = new_height
+#     # Calculate new scroll height and compare with last scroll height
+#     new_height = driver.execute_script("return document.body.scrollHeight")
+#     if new_height == last_height:
+#         break
+#     last_height = new_height
 
 try:
     # main2 = driver.find_element_by_tag_name('main')
     # scripts = main2.find_element_by_xpath('//*[contains(@id,"divList")]/script')
-    
+    time.sleep(5)
+    # results = WebDriverWait(driver, 10).until(
+    #     EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[itemprop="streetAddress"]'))
+    # )
     results = WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'span[itemprop="streetAddress"]'))
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[class="pull-left ma-0 mb-5 ml-5 clearfix search-list-pa-item ps-r"]'))
     )
     # results = main.find_element_by_tag_name('script')
     for result in results:
