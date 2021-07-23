@@ -26,9 +26,14 @@ def searchForRecipe(user_search, *page_count):
     search.send_keys(user_search)
     search.send_keys(Keys.RETURN)
 
+    # parse total number of results and calculate approx. number of total pages
+    total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
+    limit = (total / 23) + (total % 23)
+
     # load all desired results
-    load_pages(user_search, page_count) if len(page_count) > 0 else load_pages(user_search)
-    
+    pages = load_pages(user_search, limit, page_count) if len(page_count) > 0 else load_pages(user_search, limit)
+    print('%d pages loaded' % pages)
+
     # find all recipes and scrape info
     try:
         results = WebDriverWait(driver, 10).until(
@@ -43,27 +48,31 @@ def searchForRecipe(user_search, *page_count):
 
 
 # separate function to load pages
-def load_pages(search, *page_count):
+def load_pages(search, limit, *page_count):
     #format search string
     f_search = search.replace(' ','%2520')
     current_page = 1
+    try:
+        page_limit = int(''.join(map(str, page_count[0])))
+    except:
+        page_limit = limit # if tuple is empty and no user input
 
     # if user input page limit, return that number pages
-    if len(page_count) > 0:
-        if page_count[0] < 1:
-            pass
-        page_limit = page_count[0]
+    if len(page_count) > 0 and page_limit > 0:
         while current_page < page_limit:
             current_page += 1
             try:
-                requests.get('https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?search={f_search}&page={current_page}')
+                response = requests.get('https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?search={f_search}&page={current_page}')
+                data = response.json()
+                print(data)
+                # print(data['hasNext'])
             except:
                 print('could not load page %d' % current_page)
                 return current_page - 1
-            print('page %d loaded' % current_page)
+            # print('page %d loaded' % current_page)
         return current_page
     
-    while True:
+    while current_page < limit:
         current_page += 1
         try:
             response = requests.get('https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?search={f_search}&page={current_page}')
@@ -73,7 +82,7 @@ def load_pages(search, *page_count):
         print('page %d loaded' % current_page)
     return current_page
 
-searchForRecipe('cheese pizza')
+searchForRecipe('cheese pizza', 2)
 
 time.sleep(4)
 driver.quit()
