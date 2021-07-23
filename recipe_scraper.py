@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys #allows keystrokes
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 import time, json, requests
 import pandas as pd
 
@@ -19,27 +20,37 @@ driver.get('https://www.allrecipes.com/')
 print("Connected to: " + driver.title)
 
 # returns list of recipes
-def searchForRecipe(user_search, *page_count):
+def searchForRecipe(user_search, page_count):
     search = driver.find_element_by_id('search-block')
     search.clear() 
     search.send_keys(user_search)
     search.send_keys(Keys.RETURN)
 
     # parse total number of results and calculate approx. number of total pages
-    total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
-    limit = (total / 23) + (total % 23)
-
-    # load all desired results
-    pages = load_pages(user_search, limit, page_count) if len(page_count) > 0 else load_pages(user_search, limit)
-    print('%d pages loaded' % pages)
+    # then load all desired results
+    # total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
+    # limit = (total / 24) + (total % 24)
+    # pages = load_pages(user_search, limit, page_count) if len(page_count) > 0 else load_pages(user_search, limit)
+    # print('%d pages loaded' % pages)
+    actions = ActionChains(driver)
+    load_element = driver.find_element_by_id('search-results-load-more-container')
+    for i in range(page_count):
+        actions.move_to_element(load_element)
+        actions.perform()
 
     # find all recipes and scrape info
     try:
-        results = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, 'card__recipe card__facetedSearchResult'))
+        results = WebDriverWait(driver, 15, poll_frequency=1).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, 'card__recipe'))
         )
         for result in results:
             recipe_url = result.find_element_by_tag_name('a').get_attribute('href')
+            recipe_title = result.find_element_by_tag_name('a').get_attribute('title')
+            recipe_rating = float(result.find_element_by_class_name('review-star-text').text.split(' ')[1])
+            recipe_rating_count = int(result.find_element_by_class_name('card__ratingCount').text.split(' ')[0])
+            recipe_summary = result.find_element_by_class_name('card__summary').text
+            recipe_author = result.find_element_by_class_name('card__authorName').text
+            print(recipe_title)
     except:
         print('failed to parse recipes')
         print('quitting...')
@@ -62,8 +73,8 @@ def load_pages(search, limit, *page_count):
             current_page += 1
             try:
                 response = requests.get('https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?search={f_search}&page={current_page}')
-                data = json.loads(response.text)
-                print(data['hasNext'])
+                # data = json.loads(response.text)
+                # print(data['hasNext'])
             except:
                 print('could not load page %d' % current_page)
                 return current_page - 1
@@ -84,5 +95,5 @@ def load_pages(search, limit, *page_count):
 
 searchForRecipe('cheese pizza', 3)
 
-time.sleep(4)
-driver.quit()
+# time.sleep(4)
+# driver.quit()
