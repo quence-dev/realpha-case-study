@@ -10,7 +10,10 @@ import pandas as pd
 
 # webdriver location on computer
 PATH = '/Users/Quence/Webdrivers/chromedriver'
-driver = webdriver.Chrome(PATH)
+# set driver to open incognito window instead
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--incognito")
+driver = webdriver.Chrome(PATH, chrome_options=chrome_options)
 
 # open a webpage
 driver.get('https://www.allrecipes.com/')
@@ -24,7 +27,7 @@ def searchForRecipe(user_search, *page_count):
     search.send_keys(Keys.RETURN)
 
     # load all desired results
-    load_pages(user_search, page_count)
+    load_pages(user_search, page_count) if len(page_count) > 0 else load_pages(user_search)
     
     # find all recipes and scrape info
     try:
@@ -43,13 +46,13 @@ def searchForRecipe(user_search, *page_count):
 def load_pages(search, *page_count):
     #format search string
     f_search = search.replace(' ','%2520')
-
-    pg = list(page_count)
     current_page = 1
 
     # if user input page limit, return that number pages
-    if len(pg) > 0:
-        page_limit = list(page_count).pop(0)
+    if len(page_count) > 0:
+        if page_count[0] < 1:
+            pass
+        page_limit = page_count[0]
         while current_page < page_limit:
             current_page += 1
             try:
@@ -69,7 +72,6 @@ def load_pages(search, *page_count):
             return current_page - 1
         print('page %d loaded' % current_page)
     return current_page
-
 
 searchForRecipe('cheese pizza')
 
