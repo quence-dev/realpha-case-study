@@ -4,8 +4,7 @@ from selenium.webdriver.common.keys import Keys #allows keystrokes
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
-import json, requests
+import time, json, requests
 import pandas as pd
 
 # webdriver location on computer
@@ -63,9 +62,8 @@ def load_pages(search, limit, *page_count):
             current_page += 1
             try:
                 response = requests.get('https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?search={f_search}&page={current_page}')
-                data = response.json()
-                print(data)
-                # print(data['hasNext'])
+                data = json.loads(response.text)
+                print(data['hasNext'])
             except:
                 print('could not load page %d' % current_page)
                 return current_page - 1
@@ -76,13 +74,15 @@ def load_pages(search, limit, *page_count):
         current_page += 1
         try:
             response = requests.get('https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?search={f_search}&page={current_page}')
+            data = json.loads(response.text)
+            print(data['hasNext'])
         except:
             print('error: %d. Could not load page %d' % response.status_code, current_page)
             return current_page - 1
         print('page %d loaded' % current_page)
     return current_page
 
-searchForRecipe('cheese pizza', 2)
+searchForRecipe('cheese pizza', 3)
 
 time.sleep(4)
 driver.quit()
