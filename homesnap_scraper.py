@@ -10,7 +10,10 @@ import pandas as pd
 
 # webdriver location on computer
 PATH = '/Users/Quence/Webdrivers/chromedriver'
-driver = webdriver.Chrome(PATH)
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--incognito")
+chrome_options.add_argument("--disable-notifications")
+driver = webdriver.Chrome(PATH, chrome_options=chrome_options)
 
 # open a webpage
 driver.get('https://www.homesnap.com/')
@@ -68,6 +71,8 @@ try:
             'zipcode': zipcode
         }
         property_data.append(property_item)
+        time.sleep(0.25)
+
     print('process complete')
 except:
     print("JSON failed")
