@@ -31,8 +31,9 @@ def searchForRecipe(user_search, *page_count):
     total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
     limit = (total / 24) if  total % 24 == 0 else (total/24) + 1
     print('limit: %d' % limit)
-    pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
-    print('%d pages loaded' % pages)
+    # pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
+    # print('%d pages loaded' % pages)
+
     # actions = ActionChains(driver)
     # load_element = driver.find_element_by_id('search-results-load-more-container')
     # for i in range(page_count):
@@ -54,16 +55,18 @@ def searchForRecipe(user_search, *page_count):
             recipe_summary = result.find_element_by_class_name('card__summary').text
             recipe_author = result.find_element_by_class_name('card__authorName').text
 
+            print(recipe_url)
+            details = getRecipeDetails(recipe_url)
+
             recipe_item = {
             'title': recipe_title,
             'summary': recipe_summary,
             'rating': recipe_rating,
             'rating_count': recipe_rating_count,
             'url': recipe_url,
-            'author': recipe_author
+            'author': recipe_author,
+            'metadata': details
             }
-
-            details = getRecipeDetails(recipe_url)
 
             search_results.append(recipe_item)
         
@@ -75,12 +78,12 @@ def searchForRecipe(user_search, *page_count):
         print('quitting...')
         driver.quit()
 
+# function to get recipe metadata
 def getRecipeDetails(recipeURL):
-    search_result = driver.find_element_by_xpath("//a[href='{recipeURL}']")
-    driver.click(search_result)
+    driver.get(recipeURL)
     try:
         details_section = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'recipe-meta-container two-subcol-content clearfix'))
+            EC.presence_of_element_located((By.CLASS_NAME, 'recipe-meta-container'))
         )
         details = details_section.find_elements_by_class_name('recipe-meta-item-body')
         
@@ -90,24 +93,40 @@ def getRecipeDetails(recipeURL):
             ingredients.append(ingredient.text)
             print(ingredient.text)
 
+        directions = []
+        steps = driver.find_element_by_css_selector('ul[class="instructions-section"]')
+        list_of_steps = steps.find_elements_by_css_selector('li p')
+        for step in list_of_steps:
+            directions.append(step.text)
+            print(step.text)
+
         metadata = {
-            'prep': details[0],
-            'cook': details[1],
-            'additional': details[2],
-            'total': details[3],
-            'servings': details[4],
-            'yield': details[5],
-            'ingredients': ingredients
+            'prep': details[0].text,
+            'cook': details[1].text,
+            'additional': details[2].text,
+            'total': details[3].text,
+            'servings': details[4].text,
+            'yield': details[5].text,
+            'ingredients': ingredients,
+            'directions': directions
+        }
+        driver.back()
+        return metadata
+    except:
+        print('failed to get instructions')
+        driver.back()
+        return {
+            'prep': 0,
+            'cook': 0,
+            'additional': 0,
+            'total': 0,
+            'servings': 0,
+            'yield': 0,
+            'ingredients': [],
+            'directions': []
         }
 
-
-
-    except:
-        print('failed')
-        return
-
-
-
+# loads pages via page navigation
 def loader(limit, *page_count):
     actions = ActionChains(driver)
     load_element = driver.find_element_by_id('search-results-load-more-container')
@@ -178,7 +197,7 @@ def load_pages(search, limit, *page_count):
         print('page %d loaded' % current_page)
     return current_page
 
-searchForRecipe('cheese pizza', 3)
+searchForRecipe('cheese pizza', 1)
 
 # time.sleep(4)
 # driver.quit()
