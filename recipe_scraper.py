@@ -55,8 +55,7 @@ def searchForRecipe(user_search, *page_count):
             recipe_summary = result.find_element_by_class_name('card__summary').text
             recipe_author = result.find_element_by_class_name('card__authorName').text
 
-            print(recipe_url)
-            details = getRecipeDetails(recipe_url)
+            # details = getRecipeDetails(recipe_url)
 
             recipe_item = {
             'title': recipe_title,
@@ -64,12 +63,15 @@ def searchForRecipe(user_search, *page_count):
             'rating': recipe_rating,
             'rating_count': recipe_rating_count,
             'url': recipe_url,
-            'author': recipe_author,
-            'metadata': details
+            'author': recipe_author
             }
 
             search_results.append(recipe_item)
         
+        # save raw json file
+        with open('data.json', 'w') as f:
+            json.dump(search_results, f)
+
         df = pd.DataFrame(search_results)
         print(df)
 
