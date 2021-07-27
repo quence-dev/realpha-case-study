@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver #initial import
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.keys import Keys #allows keystrokes
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,6 +13,7 @@ PATH = '/Users/Quence/Webdrivers/chromedriver'
 # set driver to open incognito window instead
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
+chrome_options.add_argument("--disable-notifications")
 driver = webdriver.Chrome(PATH, chrome_options=chrome_options)
 
 # open a webpage
@@ -31,8 +32,8 @@ def searchForRecipe(user_search, *page_count):
     total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
     limit = (total / 24) if  total % 24 == 0 else (total/24) + 1
     print('limit: %d' % limit)
-    # pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
-    # print('%d pages loaded' % pages)
+    pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
+    print('%d pages loaded' % pages)
 
     # actions = ActionChains(driver)
     # load_element = driver.find_element_by_id('search-results-load-more-container')
@@ -44,7 +45,7 @@ def searchForRecipe(user_search, *page_count):
     try:
         search_results = []
 
-        results = WebDriverWait(driver, 60).until(
+        results = WebDriverWait(driver, 60, poll_frequency=1).until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, 'card__recipe'))
         )
         for result in results:
@@ -54,8 +55,6 @@ def searchForRecipe(user_search, *page_count):
             recipe_rating_count = int(result.find_element_by_class_name('card__ratingCount').text.split(' ')[0])
             recipe_summary = result.find_element_by_class_name('card__summary').text
             recipe_author = result.find_element_by_class_name('card__authorName').text
-
-            # details = getRecipeDetails(recipe_url)
 
             recipe_item = {
             'title': recipe_title,
@@ -68,21 +67,26 @@ def searchForRecipe(user_search, *page_count):
 
             search_results.append(recipe_item)
         
+        # doesn't work...
+        # for x in len(search_results):
+        #     details = getRecipeDetails(search_results[i]['url'])
+        #     search_results[i]['metadata'] = details
+
         # save raw json file
-        with open('data.json', 'w') as f:
-            json.dump(search_results, f)
+        # with open('data.json', 'w') as f:
+        #     json.dump(search_results, f)
 
         df = pd.DataFrame(search_results)
         print(df)
 
     except:
-        print('failed to parse recipes')
-        print('quitting...')
+        print('failed to parse recipes. quitting...')
         driver.quit()
 
 # function to get recipe metadata
 def getRecipeDetails(recipeURL):
     driver.get(recipeURL)
+
     try:
         details_section = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'recipe-meta-container'))
@@ -112,11 +116,10 @@ def getRecipeDetails(recipeURL):
             'ingredients': ingredients,
             'directions': directions
         }
-        driver.back()
         return metadata
+
     except:
         print('failed to get instructions')
-        driver.back()
         return {
             'prep': 0,
             'cook': 0,
@@ -141,12 +144,13 @@ def loader(limit, *page_count):
     except:
         page_limit = limit # if tuple is empty and no user input
 
-    # if user input page limit, return that number pages
+    # if user entered a page limit, return that number of pages (or max possible)
     if len(page_count) > 0 and page_limit > 0:
         while current_page < page_limit:
             current_page += 1
             try:
                 actions.perform()
+                time.sleep(0.5)
             except:
                 print('could not load page %d' % current_page)
                 return current_page - 1
@@ -163,7 +167,7 @@ def loader(limit, *page_count):
         print('page %d loaded' % current_page)
     return current_page
 
-# separate function to load pages
+# separate function to load pages, doesn't work
 def load_pages(search, limit, *page_count):
     #format search string
     f_search = search.replace(' ','%2520')
@@ -199,7 +203,7 @@ def load_pages(search, limit, *page_count):
         print('page %d loaded' % current_page)
     return current_page
 
-searchForRecipe('cheese pizza', 1)
+searchForRecipe('cheese pizza', 3)
 
 # time.sleep(4)
 # driver.quit()
