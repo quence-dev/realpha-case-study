@@ -1,5 +1,4 @@
 .DS_Store
 config.py
-*.json
 __pycache__/
 env/
