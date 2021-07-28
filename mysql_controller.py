@@ -15,6 +15,7 @@ cursor = db.cursor()
 with open("data.json") as json_data_file:
     data = json.load(json_data_file)
 
+
 # cursor.execute("CREATE DATABASE allrecipes")
 # cursor.execute("CREATE TABLE recipes (id int PRIMARY KEY AUTO_INCREMENT, title TEXT, summary TEXT, rating FLOAT, rating_count INT, url TEXT, author VARCHAR(50))")
 # for items in data:
@@ -25,8 +26,8 @@ with open("data.json") as json_data_file:
 # for items in data:
     # cursor.execute("INSERT INTO recipe_stats(prep, cook, additional, total, servings, yield) VALUES (%s,%s,%s,%s,%s,%s)", (items['metadata']['prep'], items['metadata']['cook'], items['metadata']['additional'], items['metadata']['total'], int(items['metadata']['servings']), items['metadata']['yield']))
 
-# cursor.execute('CREATE TABLE directions (recipeID int PRIMARY KEY NOT NULL, FOREIGN KEY (recipeID) REFERENCES recipes(id), direction TEXT, step INT)')
-# cursor.execute('CREATE TABLE ingredients (recipeID int PRIMARY KEY NOT NULL, FOREIGN KEY (recipeID) REFERENCES recipes(id), ingredient TEXT)')
+# cursor.execute('CREATE TABLE directions (recipeID int NOT NULL, FOREIGN KEY (recipeID) REFERENCES recipes(id), direction TEXT, step INT)')
+# cursor.execute('CREATE TABLE ingredients (recipeID int NOT NULL, FOREIGN KEY (recipeID) REFERENCES recipes(id), ingredient TEXT)')
 
 # cursor.execute('SELECT id, title, rating FROM recipes WHERE rating > 4.8')
 
@@ -36,16 +37,26 @@ with open("data.json") as json_data_file:
 
 # for items in data:
 #     for i in items['metadata']['ingredients']:
-#         cursor.execute("INSERT INTO ingredients(ingredient) VALUES (%s)", (i))
+#         cursor.execute("INSERT INTO ingredients(recipeID, ingredient) VALUES (%s)", (i))
+
+# for items in data:
+#     for i in items['metadata']['directions']:
+#         cursor.execute("INSERT INTO directions(recipeID, direction, step) VALUES (%s,%s,%s)", (i))
 
 Q1 = "INSERT INTO recipes(title, summary, rating, rating_count, url, author) VALUES (%s, %s, %s, %s, %s, %s)"
 Q2 = "INSERT INTO recipe_stats(recipeID, prep, cook, additional, total, servings, yield) VALUES (%s,%s,%s,%s,%s,%s,%s)"
 Q3 = "INSERT INTO ingredients(recipeID, ingredient) VALUES (%s, %s)"
-Q4 = ""
+Q4 = "INSERT INTO directions(recipeID, direction, step) VALUES (%s,%s,%s)"
 
-for x, items in enumerate(data):
-    cursor.execute(Q1, (items['title'], items['summary'], items['rating'], items['rating_count'], items['url'], items['author']))
-    last_id = cursor.lastrowid
-    cursor.execute(Q2, (last_id, items['metadata']['prep'], items['metadata']['cook'], items['metadata']['additional'], items['metadata']['total'], int(items['metadata']['servings']), items['metadata']['yield']))
+# for items in data:
+#     cursor.execute(Q1, (items['title'], items['summary'], items['rating'], items['rating_count'], items['url'], items['author']))
+#     last_id = cursor.lastrowid
+#     cursor.execute(Q2, (last_id, items['metadata']['prep'], items['metadata']['cook'], items['metadata']['additional'], items['metadata']['total'], int(items['metadata']['servings']), items['metadata']['yield']))
+#     for i in items['metadata']['ingredients']:
+#         cursor.execute(Q3, (last_id, i))
+#     for count, i in enumerate(items['metadata']['directions']):
+#         cursor.execute(Q4, (last_id, i, count+1))
 
-db.commit()
+cursor.execute('SELECT * FROM ingredients')
+for x in cursor:
+    print(x)
