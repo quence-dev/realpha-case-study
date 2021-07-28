@@ -14,7 +14,7 @@ PATH = '/Users/Quence/Webdrivers/chromedriver'
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--disable-notifications")
-driver = webdriver.Chrome(PATH, chrome_options=chrome_options)
+driver = webdriver.Chrome(PATH, options=chrome_options)
 
 # open a webpage
 driver.get('https://www.allrecipes.com/')
@@ -68,9 +68,10 @@ def searchForRecipe(user_search, *page_count):
             search_results.append(recipe_item)
         
         # doesn't work...
-        # for x in range(len(search_results)):
-        #     details = getRecipeDetails(search_results[i]['url'])
-        #     search_results[i]['metadata'] = details
+        for x in range(len(search_results)):
+            myurl = search_results[x]['url']
+            details = getRecipeDetails(myurl)
+            search_results[x]['metadata'] = details
 
         # save raw json file
         # with open('data.json', 'w') as f:
@@ -92,19 +93,20 @@ def getRecipeDetails(recipeURL):
             EC.presence_of_element_located((By.CLASS_NAME, 'recipe-meta-container'))
         )
         details = details_section.find_elements_by_class_name('recipe-meta-item-body')
-        
+        print(details)
+
         ingredients = []
         ingredient_items = driver.find_elements_by_class_name('ingredients-item-name')
         for ingredient in ingredient_items:
             ingredients.append(ingredient.text)
-            print(ingredient.text)
+            # print(ingredient.text)
 
         directions = []
         steps = driver.find_element_by_css_selector('ul[class="instructions-section"]')
         list_of_steps = steps.find_elements_by_css_selector('li p')
         for step in list_of_steps:
             directions.append(step.text)
-            print(step.text)
+            # print(step.text)
 
         metadata = {
             'prep': details[0].text,
@@ -117,7 +119,6 @@ def getRecipeDetails(recipeURL):
             'directions': directions
         }
         return metadata
-
     except:
         print('failed to get instructions')
         return {
@@ -150,7 +151,6 @@ def loader(limit, *page_count):
             current_page += 1
             try:
                 actions.perform()
-                time.sleep(0.5)
             except:
                 print('could not load page %d' % current_page)
                 return current_page - 1
