@@ -68,7 +68,7 @@ def searchForRecipe(user_search, *page_count):
             search_results.append(recipe_item)
         
         # doesn't work...
-        # for x in len(search_results):
+        # for x in range(len(search_results)):
         #     details = getRecipeDetails(search_results[i]['url'])
         #     search_results[i]['metadata'] = details
 
