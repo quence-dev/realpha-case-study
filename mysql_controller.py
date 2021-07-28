@@ -1,4 +1,3 @@
-from logging import currentframe
 import mysql.connector
 from config import mysql_pw
 import json

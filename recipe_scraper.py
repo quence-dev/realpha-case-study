@@ -1,6 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.keys import Keys #allows keystrokes
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -196,7 +195,6 @@ def load_pages(search, limit, *page_count):
             return current_page - 1
         print('page %d loaded' % current_page)
     return current_page
-
 
 searchForRecipe('cheese pizza', 2)
 time.sleep(4)

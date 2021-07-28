@@ -1,9 +1,6 @@
 import mysql.connector
-import json
-from pandas.core.frame import DataFrame
 import requests
 import numpy as np
-import pandas as pd
 from config import api_key, endpoint, mysql_pw
 import quandl
 
