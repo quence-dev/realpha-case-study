@@ -67,7 +67,6 @@ def searchForRecipe(user_search, *page_count):
 
             search_results.append(recipe_item)
         
-        # doesn't work...
         for x in range(len(search_results)):
             myurl = search_results[x]['url']
             details = getRecipeDetails(myurl)
@@ -89,32 +88,34 @@ def getRecipeDetails(recipeURL):
     driver.get(recipeURL)
 
     try:
-        details_section = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'recipe-meta-container'))
+        details = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, 'recipe-meta-item-body'))
         )
-        details = details_section.find_elements_by_class_name('recipe-meta-item-body')
-        print(details)
+        prep_time = details[0].text
+        cook_time = "" if len(details) == 4 else details[1].text # can be unavailable
+        add_time = "" if len(details) == 4 or len(details) == 5 else details[2].text # can be unavailable
+        total_time = details[len(details)-3].text
+        servings = details[len(details)-2].text
+        total_yield = details[len(details)-1].text
 
         ingredients = []
         ingredient_items = driver.find_elements_by_class_name('ingredients-item-name')
         for ingredient in ingredient_items:
             ingredients.append(ingredient.text)
-            # print(ingredient.text)
 
         directions = []
         steps = driver.find_element_by_css_selector('ul[class="instructions-section"]')
         list_of_steps = steps.find_elements_by_css_selector('li p')
         for step in list_of_steps:
             directions.append(step.text)
-            # print(step.text)
 
         metadata = {
-            'prep': details[0].text,
-            'cook': details[1].text,
-            'additional': details[2].text,
-            'total': details[3].text,
-            'servings': details[4].text,
-            'yield': details[5].text,
+            'prep': prep_time,
+            'cook': cook_time,
+            'additional': add_time,
+            'total': total_time,
+            'servings': servings,
+            'yield': total_yield,
             'ingredients': ingredients,
             'directions': directions
         }
@@ -203,7 +204,7 @@ def load_pages(search, limit, *page_count):
         print('page %d loaded' % current_page)
     return current_page
 
-searchForRecipe('cheese pizza', 3)
+searchForRecipe('cheese pizza', 2)
 
 # time.sleep(4)
 # driver.quit()
