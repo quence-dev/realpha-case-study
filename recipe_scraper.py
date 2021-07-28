@@ -32,14 +32,8 @@ def searchForRecipe(user_search, *page_count):
     total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
     limit = (total / 24) if  total % 24 == 0 else (total/24) + 1
     print('limit: %d' % limit)
-    pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
-    print('%d pages loaded' % pages)
-
-    # actions = ActionChains(driver)
-    # load_element = driver.find_element_by_id('search-results-load-more-container')
-    # for i in range(page_count):
-    #     actions.move_to_element(load_element)
-    #     actions.perform()
+    # pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
+    # print('%d pages loaded' % pages)
 
     # find all recipes and scrape info
     try:
@@ -73,8 +67,8 @@ def searchForRecipe(user_search, *page_count):
             search_results[x]['metadata'] = details
 
         # save raw json file
-        # with open('data.json', 'w') as f:
-        #     json.dump(search_results, f)
+        with open('data.json', 'w') as f:
+            json.dump(search_results, f)
 
         df = pd.DataFrame(search_results)
         print(df)
@@ -204,7 +198,7 @@ def load_pages(search, limit, *page_count):
         print('page %d loaded' % current_page)
     return current_page
 
-searchForRecipe('cheese pizza', 2)
 
-# time.sleep(4)
-# driver.quit()
+searchForRecipe('cheese pizza', 2)
+time.sleep(4)
+driver.quit()
