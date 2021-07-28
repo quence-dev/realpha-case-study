@@ -26,19 +26,6 @@ search.clear() #ensure text field is empty
 search.send_keys("New York, NY") #type a string into input
 search.send_keys(Keys.RETURN) #hit enter
 
-# load a few pages
-actions = ActionChains(driver)
-try:
-    load_element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, "//*[contains(@id,'divAreaStats')]"))
-    )
-    for i in range(4):
-        actions.perform()
-        time.sleep(1)
-except:
-    print("can't find element")
-actions.move_to_element(load_element)
-
 try:
     time.sleep(10)
     results = WebDriverWait(driver, 10).until(
