@@ -1,5 +1,6 @@
 import mysql.connector
 import requests
+import json
 import numpy as np
 from config import api_key, endpoint, mysql_pw
 import quandl
@@ -26,8 +27,8 @@ def getData(indicator,region):
 homes = getData('ZSFH', '10001')
 
 # save raw json file
-# with open('data.json', 'w') as f:
-#     json.dump(homes, f)
+with open('home_data.json', 'w') as f:
+    json.dump(homes, f)
 
 price_array = []
 for home in homes['datatable']['data']:
