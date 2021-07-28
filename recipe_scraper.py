@@ -31,7 +31,6 @@ def searchForRecipe(user_search, *page_count):
     # then load all desired results
     total = int(''.join(driver.find_element_by_id('search-results-total-results').text.split(' ')[0].split(',')))
     limit = (total / 24) if  total % 24 == 0 else (total/24) + 1
-    print('limit: %d' % limit)
     # pages = loader(limit, page_count) if len(page_count) > 0 else loader(limit)
     # print('%d pages loaded' % pages)
 
@@ -113,9 +112,11 @@ def getRecipeDetails(recipeURL):
             'ingredients': ingredients,
             'directions': directions
         }
+        driver.close()
         return metadata
     except:
         print('failed to get instructions')
+        driver.close()
         return {
             'prep': 0,
             'cook': 0,
