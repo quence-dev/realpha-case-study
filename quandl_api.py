@@ -6,17 +6,8 @@ import numpy as np
 import pandas as pd
 from config import api_key, endpoint, mysql_pw
 import quandl
-# import pandas as pd
-
-# load configs
-# with open('config.json') as json_data_file:
-#     data = json.load(json_data_file)    
-
-# key = data["api_key"]
-# endpoint = data["endpoint"]
 
 # connect to MySQL
-# mysql_pw = data["mysql_pw"]
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
