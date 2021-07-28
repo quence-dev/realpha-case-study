@@ -14,7 +14,6 @@ cursor = db.cursor()
 with open("data.json") as json_data_file:
     data = json.load(json_data_file)
 
-
 # cursor.execute("CREATE DATABASE allrecipes")
 
 # cursor.execute("CREATE TABLE recipes (id int PRIMARY KEY AUTO_INCREMENT, title TEXT, summary TEXT, rating FLOAT, rating_count INT, url TEXT, author VARCHAR(50))")
@@ -50,12 +49,19 @@ S3 = 'SELECT title, step, direction FROM recipes JOIN directions ON recipes.id =
 S4 = 'SELECT title, servings, yield FROM recipes JOIN recipe_stats ON recipes.id = recipe_stats.recipeID WHERE servings > 10'
 
 # show recipes with no additional time
-S5 = 'SELECT id, title, total FROM recipes JOIN recipe_stats ON recipes.id = recipe_stats.recipeID WHERE additional IS NULL'
+S5 = 'SELECT title AS recipe_title, total AS total_time FROM recipes JOIN recipe_stats ON recipes.id = recipe_stats.recipeID WHERE additional IS NULL'
 
 # update table to treat empty strings as null
 # U1 = 'UPDATE recipe_stats SET additional = NULL WHERE additional = ""'
 # cursor.execute(U1)
 
 cursor.execute(S5)
-for x in cursor:
-    print(x)
+headers = [x[0] for x in cursor.description]
+results = cursor.fetchall()
+
+json_data = []
+for result in results:
+    json_data.append(dict(zip(headers,result)))
+
+with open('example.json', 'w') as f:
+    json.dump(json_data, f, indent=2)
